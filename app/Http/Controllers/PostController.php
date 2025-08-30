@@ -4,10 +4,41 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    //
+    public function actuallyUpdate(Post $post, Request $request) {
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+
+        $post->update($incomingFields);
+
+        return redirect("/post/{$post->id}")->with('success', 'Post successfully updated.');
+    }
+
+    public function showEditForm(Post $post) {
+        return view('edit-post', ['post' => $post]);
+    }
+
+    // Delete a post
+    public function deletePost(Post $post) {
+        $post->delete();
+
+        return redirect("/profile/" . auth()->user()->username)->with('success', 'Post successfully deleted.');
+    }
+
+    public function viewSinglePost(Post $post)
+    {
+        $post['body'] = strip_tags(Str::markdown($post->body), '<p><br><ul><ol><li><strong><em><h1><h2><h3><h4><h5><h6>');
+        return view('single-post', ['post' => $post]);
+    }
+
     public function storeNewPost(Request $request) {
         $incomingFields = $request->validate([
             'title' => 'required',
@@ -18,9 +49,9 @@ class PostController extends Controller
         $incomingFields['body'] = strip_tags($incomingFields['body']);
         $incomingFields['user_id'] = auth()->id();
 
-        Post::create($incomingFields);
+        $newPost = Post::create($incomingFields);
 
-        return 'hey!!!';
+        return redirect("/post/{$newPost->id}")->with('success', 'New post successfully created.');
     }
 
     public function showCreateForm() {

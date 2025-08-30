@@ -15,12 +15,25 @@ use App\Http\Controllers\UserController;
 |
 */
 
+Route::get('/admins-only', function () {
+    return "Only admins can see this page";
+})->middleware('can:visitAdminPages')->name('admins-only');
+
 // User related routes
-Route::get('/', [UserController::class, "showCorrectHomepage"]);
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
-Route::post('/logout', [UserController::class, 'logout']);
+Route::get('/', [UserController::class, "showCorrectHomepage"])->name('login');
+Route::post('/register', [UserController::class, 'register'])->middleware('guest');
+Route::post('/login', [UserController::class, 'login'])->middleware('guest');
+Route::post('/logout', [UserController::class, 'logout'])->middleware('MustBeLoggedIn');
+Route::get('/manage-avatar', [UserController::class, 'showAvatarForm'])->middleware('MustBeLoggedIn');
+Route::post('/manage-avatar', [UserController::class, 'storeAvatar'])->middleware('MustBeLoggedIn');
 
 // Blog post related routes
-Route::get('/create-post', [PostController::class, 'showCreateForm']);
-Route::post('/create-post', [PostController::class, 'storeNewPost']);
+Route::get('/create-post', [PostController::class, 'showCreateForm'])->middleware('MustBeLoggedIn');
+Route::post('/create-post', [PostController::class, 'storeNewPost'])->middleware('MustBeLoggedIn');
+Route::get('/post/{post}', [PostController::class, 'viewSinglePost']);
+Route::delete('/post/{post}', [PostController::class, 'deletePost'])->middleware('can:delete,post');
+Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middleware('can:update,post');
+Route::put('/post/{post}', [PostController::class, 'actuallyUpdate'])->middleware('can:update,post');
+
+// Profile related routes
+Route::get('/profile/{user:username}', [UserController::class, 'profile'])->name('profile');

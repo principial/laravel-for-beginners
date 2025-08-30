@@ -8,6 +8,28 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function showAvatarForm() {
+        return view('avatar-form');
+    }
+
+    public function storeAvatar(Request $request) {
+        $incomingFields = $request->validate([
+            'avatar' => 'required|image|max:1000'
+        ]);
+
+        $filename = $request->file('avatar')->store('avatars', 'public');
+
+        $user = auth()->user();
+        $user->avatar = $filename;
+        $user->save();
+
+        return redirect('/profile/' . $user->username)->with('success', 'Avatar updated successfully.');
+    }
+    public function profile(User $user)
+    {
+        return view('profile-posts', ['user' => $user, 'posts' => $user->posts()->latest()->get(), 'postsCount' => $user->posts()->count()] );
+    }
+
     public function logout() {
         auth()->logout();
         return redirect('/')->with('success', 'You are now logged out.');
