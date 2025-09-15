@@ -1,23 +1,6 @@
 <x-layout>
         <div class="container py-md-5 container--narrow">
             <h2>Manage Avatar</h2>
-
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form action="/manage-avatar" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">

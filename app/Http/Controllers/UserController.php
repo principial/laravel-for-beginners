@@ -4,38 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class UserController extends Controller
 {
-    public function showAvatarForm() {
+    public function showAvatarForm()
+    {
         return view('avatar-form');
     }
 
-    public function storeAvatar(Request $request) {
+    public function storeAvatar(Request $request)
+    {
         $incomingFields = $request->validate([
             'avatar' => 'required|image|max:1000'
         ]);
 
-        $filename = $request->file('avatar')->store('avatars', 'public');
-
         $user = auth()->user();
+        $filename = 'avatar-' . $user->id . '-' . uniqid() . '.jpg';
+
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($request->file('avatar'));
+        $imageData = $image->cover(120, 120)->toJpeg();
+        Storage::disk('public')->put("avatars/{$filename}", $imageData);
+
+        $oldAvatar = $user->avatar;
+
         $user->avatar = $filename;
         $user->save();
 
-        return redirect('/profile/' . $user->username)->with('success', 'Avatar updated successfully.');
-    }
-    public function profile(User $user)
-    {
-        return view('profile-posts', ['user' => $user, 'posts' => $user->posts()->latest()->get(), 'postsCount' => $user->posts()->count()] );
+        if ($oldAvatar != "default-avatar.jpg") {
+            Storage::disk('public')->delete(str_replace("/storage/", "", $oldAvatar));
+        }
+
+        return back()->with('success', 'Avatar successfully updated.');
     }
 
-    public function logout() {
+    public function profile(User $user)
+    {
+        return view('profile-posts', ['avatar' => $user->avatar, 'user' => $user, 'username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postsCount' => $user->posts()->count()]);
+    }
+
+    public function logout()
+    {
         auth()->logout();
         return redirect('/')->with('success', 'You are now logged out.');
     }
 
-    public function showCorrectHomepage() {
+    public function showCorrectHomepage()
+    {
         if (auth()->check()) {
             return view('homepage-feed');
         } else {
@@ -43,7 +62,8 @@ class UserController extends Controller
         }
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $incomingFields = $request->validate([
             'loginusername' => 'required',
             'loginpassword' => 'required'
@@ -57,7 +77,8 @@ class UserController extends Controller
         }
     }
 
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $incomingFields = $request->validate([
             'username' => ['required', 'min:3', 'max:20', Rule::unique('users', 'username')],
             'email' => ['required', 'email', Rule::unique('users', 'email')],

@@ -18,7 +18,7 @@
 
         <p class="text-muted small mb-4">
             <a href="#"><img class="avatar-tiny"
-                             src="/storage/{{auth()->user()->avatar}}"/></a>
+                             src="{{$post->user->avatar}}"/></a>
             Posted by <a href="#">{{$post->user->username}}</a> on {{$post->created_at->format('F j, Y')}}
             at {{$post->created_at->format('g:i A')}}
         </p>
