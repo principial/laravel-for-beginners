@@ -31,8 +31,23 @@ class FollowController extends Controller
         return back()->with('success', 'User successfully followed.');
     }
 
-    public function removeFollow()
+    public function removeFollow(User $user)
     {
+        // You can't unfollow yourself
+        if ($user->id == auth()->user()->id) {
+            return back()->with('failure', 'You can\'t unfollow yourself.');
+        }
 
+        // You can't unfollow someone you don't follow'
+        $existCheck = Follow::where([['user_id', '=', auth()->user()->id], ['followed_user_id', $user->id]])->count();
+
+        if (!$existCheck) {
+            return back()->with('failure', 'You are not following this user.');
+        }
+
+        Follow::where([['user_id', '=', auth()->user()->id], ['followed_user_id', $user->id]])->delete();
+
+        // Back with message
+        return back()->with('success', 'User successfully unfollowed.');
     }
 }
