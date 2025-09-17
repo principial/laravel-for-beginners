@@ -41,4 +41,6 @@ Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middle
 Route::put('/post/{post}', [PostController::class, 'actuallyUpdate'])->middleware('can:update,post');
 
 // Profile related routes
-Route::get('/profile/{user:username}', [UserController::class, 'profile'])->name('profile');
+Route::get('/profile/{user:username}', [UserController::class, 'profile']);
+Route::get('/profile/{user:username}/followers', [UserController::class, 'profileFollowers']);
+Route::get('/profile/{user:username}/following', [UserController::class, 'profileFollowing']);
