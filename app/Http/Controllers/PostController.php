@@ -8,7 +8,8 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    public function actuallyUpdate(Post $post, Request $request) {
+    public function actuallyUpdate(Post $post, Request $request)
+    {
         $incomingFields = $request->validate([
             'title' => 'required',
             'body' => 'required'
@@ -22,12 +23,14 @@ class PostController extends Controller
         return redirect("/post/{$post->id}")->with('success', 'Post successfully updated.');
     }
 
-    public function showEditForm(Post $post) {
+    public function showEditForm(Post $post)
+    {
         return view('edit-post', ['post' => $post]);
     }
 
     // Delete a post
-    public function deletePost(Post $post) {
+    public function deletePost(Post $post)
+    {
         $post->delete();
 
         return redirect("/profile/" . auth()->user()->username)->with('success', 'Post successfully deleted.');
@@ -39,7 +42,8 @@ class PostController extends Controller
         return view('single-post', ['post' => $post]);
     }
 
-    public function storeNewPost(Request $request) {
+    public function storeNewPost(Request $request)
+    {
         $incomingFields = $request->validate([
             'title' => 'required',
             'body' => 'required'
@@ -54,7 +58,15 @@ class PostController extends Controller
         return redirect("/post/{$newPost->id}")->with('success', 'New post successfully created.');
     }
 
-    public function showCreateForm() {
+    public function showCreateForm()
+    {
         return view('create-post');
+    }
+
+    public function search($term)
+    {
+        $posts = Post::search($term)->get();
+        $posts->load('user:id,username,avatar');
+        return $posts;
     }
 }
