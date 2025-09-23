@@ -29,6 +29,7 @@
 
         @auth
             <div class="flex-row my-3 my-md-0">
+                <livewire:search />
                 <a href="#" class="text-white mr-2 header-search-icon" title="Search" data-toggle="tooltip"
                    data-placement="bottom"><i class="fas fa-search"></i></a>
                 <span class="text-white mr-2 header-chat-icon" title="Chat" data-toggle="tooltip"
