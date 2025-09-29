@@ -4,22 +4,19 @@
             <h2>{{$post->title}}</h2>
             <span class="pt-2">
             @can('update', $post)
-                    <a href="/post/{{$post->id}}/edit" class="text-primary mr-2" data-toggle="tooltip" data-placement="top" title="Edit"><i
+                    <a wire:navigate href="/post/{{$post->id}}/edit" class="text-primary mr-2" data-toggle="tooltip"
+                       data-placement="top" title="Edit"><i
                             class="fas fa-edit"></i></a>
-                    <form class="delete-post-form d-inline" action="/post/{{$post->id}}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button class="delete-post-button text-danger" data-toggle="tooltip" data-placement="top"
-                                title="Delete"><i class="fas fa-trash"></i></button>
-          </form>
+                    <livewire:deletepost :post="$post" />
         </span>
             @endcan
         </div>
 
         <p class="text-muted small mb-4">
-            <a href="/profile/{{$post->user->username}}"><img class="avatar-tiny"
-                             src="{{$post->user->avatar}}"/></a>
-            Posted by <a href="/profile/{{$post->user->username}}">{{$post->user->username}}</a> on {{$post->created_at->format('F j, Y')}}
+            <a wire:navigate href="/profile/{{$post->user->username}}"><img class="avatar-tiny"
+                                                                            src="{{$post->user->avatar}}"/></a>
+            Posted by <a wire:navigate href="/profile/{{$post->user->username}}">{{$post->user->username}}</a>
+            on {{$post->created_at->format('F j, Y')}}
             at {{$post->created_at->format('g:i A')}}
         </p>
 

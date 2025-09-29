@@ -27,7 +27,7 @@
                                 ({{count($results)}} {{count($results) > 1 ? 'results' : 'result'}})
                             </div>
                             @foreach($results as $post)
-                                <a href="/post/{{$post->id}}" class="list-group-item list-group-item-action">
+                                <a x-on:click.prevent="isOpen = false; Livewire.navigate('/post/{{$post->id}}')" href="/post/{{$post->id}}" class="list-group-item list-group-item-action">
                                     <img class="avatar-tiny" src="{{$post->user->avatar}}">
                                     <strong>{{$post->title}}</strong>
                                     <span
@@ -40,3 +40,4 @@
             </div>
         </div>
     </div>
+</div>
