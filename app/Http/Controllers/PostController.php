@@ -44,6 +44,22 @@ class PostController extends Controller
         return view('single-post', ['post' => $post]);
     }
 
+    public function storeNewPostApi(Request $request)
+    {
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['user_id'] = auth()->id();
+
+        $newPost = Post::create($incomingFields);
+
+        return $newPost->id;
+    }
+
     public function storeNewPost(Request $request)
     {
         $incomingFields = $request->validate([
